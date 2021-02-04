@@ -51,7 +51,7 @@ export default (ins: Feed) => {
     base.rss.channel.image = {
       title: { _text: options.title },
       url: { _text: options.image },
-      link: { _text: sanitize(options.link) }
+      link: { _text: sanitize(options.link) },
     };
   }
 
@@ -104,8 +104,8 @@ export default (ins: Feed) => {
     base.rss.channel["atom:link"] = {
       _attributes: {
         href: sanitize(options.hub),
-        rel: "hub"
-      }
+        rel: "hub",
+      },
     };
   }
 
@@ -119,7 +119,7 @@ export default (ins: Feed) => {
     let item: any = {};
 
     if (entry.title) {
-      item.title = { _cdata: entry.title };
+      item.title = entry.title;
     }
 
     if (entry.link) {
@@ -143,7 +143,7 @@ export default (ins: Feed) => {
     }
 
     if (entry.description) {
-      item.description = { _cdata: entry.description };
+      item.description = entry.description;
     }
 
     if (entry.content) {
@@ -204,7 +204,14 @@ export default (ins: Feed) => {
   if (isAtom) {
     base.rss._attributes["xmlns:atom"] = "http://www.w3.org/2005/Atom";
   }
-  return convert.js2xml(base, { compact: true, ignoreComment: true, spaces: 4 });
+  return convert.js2xml(base, {
+    compact: true,
+    ignoreComment: true,
+    spaces: 4,
+    textFn(value: string) {
+      return value.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&").replace("&amp;", "&");
+    },
+  });
 };
 
 /**
